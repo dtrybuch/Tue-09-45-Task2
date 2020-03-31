@@ -34,10 +34,12 @@ class Diary:
     
 
     def get_students_grades(self,name,surname):
+        retVal = ''
         for student in self.students:
             if student.name == name and student.surname == surname:
-                return student.grades
-
+                for grade in student.grades:
+                    retVal = retVal + '{0}:{1}\n'.format(grade.subject_name, grade.grade) 
+                return retVal
 
     def get_student(self, name, surname):
         for student in self.students:
@@ -50,7 +52,7 @@ class Diary:
         len = 0
         for student in self.students:
             for grade in student.grades:
-                sum = sum + grade
+                sum = sum + grade.grade
                 len = len + 1
         if len == 0:
             return 0
@@ -61,7 +63,7 @@ class Diary:
         student = self.get_student(name,surname)
         sum = 0
         for grade in student.grades:
-            sum = sum + grade
+            sum = sum + grade.grade
         if len(student.grades) == 0:
             return 0
         return sum/len(student.grades)
@@ -75,6 +77,10 @@ class Diary:
         student = self.get_student(name,surname)
         student.add_grade(grade)
 
+class Grade:
+    def __init__(self, subject_name, grade):
+        self.subject_name = subject_name
+        self.grade = grade
 
 class Student:
 
@@ -91,13 +97,13 @@ if __name__ == "__main__":
     students = []
     students.append(Student('Jan','Kowalski'))
     diary = Diary(students) 
-    diary.add_grade_for_student('Jan','Kowalski',5)
-    diary.add_grade_for_student('Jan','Kowalski',2)
-    diary.add_grade_for_student('Jan','Kowalski',1)
+    diary.add_grade_for_student('Jan','Kowalski',Grade('PITE',5))
+    diary.add_grade_for_student('Jan','Kowalski',Grade('PITE',2))
+    diary.add_grade_for_student('Jan','Kowalski',Grade('PITE',1))
     diary.add_student(Student('Jan','Wozniak'))
-    diary.add_grade_for_student('Jan', 'Wozniak',5)
+    diary.add_grade_for_student('Jan', 'Wozniak',Grade('PITE',5))
     print(diary.get_students_grades('Jan','Kowalski'))
 
     print(diary.get_students_average())
 
-    print(diary.get_student_average('Jan','Wozniak'))
+    print(diary.get_student_average('Jan','Kowalski'))
