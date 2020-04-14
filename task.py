@@ -1,109 +1,101 @@
-# Class diary
-#
-# Create program for handling lesson scores.
-# Use python to handle student (highscool) class scores, and attendance.
-# Make it possible to:
-# - Get students total average score (average across classes)
-# - get students average score in class
-# - hold students name and surname
-# - Count total attendance of student
-#
-# Please, use your imagination and create more functionalities.
-# Your project should be able to handle entire school(s?).
-# If you have enough courage and time, try storing (reading/writing)
-# data in text files (YAML, JSON).
-# If you have even more courage, try implementing user interface (might be text-like).
-#
-#Try to expand your implementation as best as you can. 
-#Think of as many features as you can, and try implementing them.
-#Make intelligent use of pythons syntactic sugar (overloading, iterators, generators, etc)
-#Most of all: CREATE GOOD, RELIABLE, READABLE CODE.
-#The goal of this task is for you to SHOW YOUR BEST python programming skills.
-#Impress everyone with your skills, show off with your code.
-#
-#Your program must be runnable with command "python task.py".
-#Show some usecases of your library in the code (print some things)
-#
-#When you are done upload this code to your github repository. 
-#
-#Delete these comments before commit!
-#Good luck.
-class Diary:
-    def __init__(self, students):
-        self.students = students
-    
+import json
+import statistics
 
-    def get_students_grades(self,name,surname):
-        retVal = ''
-        for student in self.students:
-            if student.name == name and student.surname == surname:
-                for grade in student.grades:
-                    retVal = retVal + '{0}:{1}\n'.format(grade.subject_name, grade.grade) 
-                return retVal
-
-    def get_student(self, name, surname):
-        for student in self.students:
-            if student.name == name and student.surname == surname:
-                return student
+def create_student(first_name, last_name, grades, attendance):
+    student = {
+        'first_name': first_name,
+        'last_name': last_name,
+        'grades': grades,
+        'attendance': attendance
+    }
+    return student
 
 
-    def get_students_average(self):
-        sum = 0
-        len = 0
-        for student in self.students:
-            for grade in student.grades:
-                sum = sum + grade.grade
-                len = len + 1
-        if len == 0:
-            return 0
-        return sum/len
+def get_all_students_grades(diary, first_name, last_name):
+     for student in diary:
+        if student['first_name'] == first_name and student['last_name'] == last_name:
+            for course in student['grades']:
+                yield 'For {} {} in {} grades are {}.'.format(first_name, last_name, course, student['grades'][course])
 
 
-    def get_student_average(self, name, surname):
-        student = self.get_student(name,surname)
-        sum = 0
-        for grade in student.grades:
-            sum = sum + grade.grade
-        if len(student.grades) == 0:
-            return 0
-        return sum/len(student.grades)
+def get_all_students_attendance(diary, first_name, last_name):
+     for student in diary:
+        if student['first_name'] == first_name and student['last_name'] == last_name:
+            for course in student['attendance']:
+                yield 'For {} {} in {} attendance is {}.'.format(first_name, last_name, course, student['attendance'][course])
+
+def get_students_average_grade_in_course(diary, first_name, last_name, course):
+    for student in diary:
+        if student['first_name'] == first_name and student['last_name'] == last_name:
+            for grade in student['grades']:
+                if grade == course:
+                    return 'For {} {} average in {} is {}.'.format(first_name, last_name, course, statistics.mean(student['grades'][course]))
 
 
-    def add_student(self, student):
-        students.append(student)
+def get_average_grade_in_course(diary, course):
+    for student in diary:
+        for grade in student['grades']:
+            if grade == course:
+                yield 'In {} for {} average is {}' \
+                    .format(course, student['first_name'] + ' ' + student['last_name'], statistics.mean(student['grades'][course]))
 
 
-    def add_grade_for_student(self, name, surname, grade):
-        student = self.get_student(name,surname)
-        student.add_grade(grade)
-
-class Grade:
-    def __init__(self, subject_name, grade):
-        self.subject_name = subject_name
-        self.grade = grade
-
-class Student:
-
-    def __init__(self, name, surname):
-        self.name = name
-        self.surname = surname
-        self.grades = []
-
-        
-    def add_grade(self, grade):
-        self.grades.append(grade)
+def get_average_grade_from_course__in_school(diary, course):
+    grades = []
+    for student in diary:
+        for grade in student['grades']:
+            if grade == course:
+                grades.extend(student['grades'][course])
+    return 'In {} average {} for entire school '.format(course, statistics.mean(grades)) 
 
 if __name__ == "__main__":
-    students = []
-    students.append(Student('Jan','Kowalski'))
-    diary = Diary(students) 
-    diary.add_grade_for_student('Jan','Kowalski',Grade('PITE',5))
-    diary.add_grade_for_student('Jan','Kowalski',Grade('PITE',2))
-    diary.add_grade_for_student('Jan','Kowalski',Grade('PITE',1))
-    diary.add_student(Student('Jan','Wozniak'))
-    diary.add_grade_for_student('Jan', 'Wozniak',Grade('PITE',5))
-    print(diary.get_students_grades('Jan','Kowalski'))
+    diary = []
+    grades = {
+        'PITE':[5,4,3,5],
+        'ENG':[4,4,2]
+    }
+    attendance = {
+        'PITE':{
+            '06.04.2020': True,
+            '08.04.2020': False
+        },
+        'ENG':{
+            '06.04.2020': True,
+            '08.04.2020': True
+        }
+    }
+    diary.append(create_student('Jan','Kowalski',grades, attendance))
+    diary.append(create_student('Jan','Nowak',grades, attendance))
+    #print(diary)
+    with open('data.json', 'w') as diary_file:
+        json.dump(diary, diary_file,indent=4)
 
-    print(diary.get_students_average())
+    for course in get_all_students_grades(diary,'Jan','Kowalski'):
+        print(course)
 
-    print(diary.get_student_average('Jan','Kowalski'))
+    for course in get_all_students_attendance(diary,'Jan','Kowalski'):
+        print(course)
+
+    print(get_students_average_grade_in_course(diary,'Jan','Kowalski','PITE'))
+    print(get_students_average_grade_in_course(diary,'Jan','Kowalski','ENG'))
+    for average in get_average_grade_in_course(diary, 'PITE'):
+        print(average)
+
+    print(get_average_grade_from_course__in_school(diary,'ENG'))
+    
+    print('\n### Get data from file ###\n')
+    with open('data2.json', 'r') as diary_file:
+        diary = json.load(diary_file)
+
+    for course in get_all_students_grades(diary,'Donald','Trump'):
+        print(course)
+
+    for course in get_all_students_attendance(diary,'Jan','Pasek'):
+        print(course)
+
+    print(get_students_average_grade_in_course(diary,'Donald','Trump','PITE'))
+    print(get_students_average_grade_in_course(diary,'Jan','Pasek','ENG'))
+    for average in get_average_grade_in_course(diary, 'PITE'):
+        print(average)
+
+    print(get_average_grade_from_course__in_school(diary,'ENG'))

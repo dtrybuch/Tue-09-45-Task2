@@ -1,0 +1,56 @@
+[
+    {
+        "first_name": "Donald",
+        "last_name": "Trump",
+        "grades": {
+            "PITE": [
+                5,
+                4,
+                3,
+                5
+            ],
+            "ENG": [
+                4,
+                4,
+                2
+            ]
+        },
+        "attendance": {
+            "PITE": {
+                "06.04.2020": true,
+                "08.04.2020": false
+            },
+            "ENG": {
+                "06.04.2020": true,
+                "08.04.2020": true
+            }
+        }
+    },
+    {
+        "first_name": "Jan",
+        "last_name": "Pasek",
+        "grades": {
+            "PITE": [
+                4,
+                4,
+                2,
+                3
+            ],
+            "ENG": [
+                5,
+                4,
+                2
+            ]
+        },
+        "attendance": {
+            "PITE": {
+                "06.04.2020": true,
+                "08.04.2020": false
+            },
+            "ENG": {
+                "06.04.2020": false,
+                "08.04.2020": true
+            }
+        }
+    }
+]
